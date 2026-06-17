@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+:root {
+  /* Base */
+  --color-bg: #272829;
+  --color-sidebar: #27374d;
+  --color-surface: #1f2021;
+  --color-surface-soft: #343638;
+
+  /* Identidad DevBoard */
+  --color-primary: #27374d;
+  --color-secondary: #526d82;
+  --color-light: #dde6ed;
+
+  /* Texto */
+  --color-text: #dde6ed;
+  --color-text-muted: #9fb0bf;
+  --color-text-soft: #c5d1dc;
+
+  /* Bordes */
+  --color-border: rgba(221, 230, 237, 0.12);
+  --color-border-strong: rgba(221, 230, 237, 0.22);
+
+  /* Estados de tareas */
+  --status-backlog: #6b7280;
+  --status-todo: #3b82f6;
+  --status-in-progress: #8b5cf6;
+  --status-review: #f59e0b;
+  --status-done: #22c55e;
+
+  /* Prioridades */
+  --priority-low: #22c55e;
+  --priority-medium: #3b82f6;
+  --priority-high: #f97316;
+  --priority-critical: #ef4444;
+
+  /* Avisos */
+  --notice-info: #38bdf8;
+  --notice-important: #f59e0b;
+  --notice-urgent: #ef4444;
+
+  /* Reportes */
+  --report-generated: #3b82f6;
+  --report-pending: #f59e0b;
+  --report-reviewed: #22c55e;
+
+  /* UI */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --transition: 0.2s ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: Inter, system-ui, sans-serif;
+}
