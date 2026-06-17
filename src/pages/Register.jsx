@@ -1,17 +1,52 @@
-import { Link } from "react-router";
-import { FiLock, FiMail, FiUser } from "react-icons/fi";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { FiEye, FiEyeOff, FiLock, FiMail, FiUser } from "react-icons/fi";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import AuthInput from "../components/AuthInput";
+import { registerSchema } from "../schemas/authSchema";
+import { useRegister } from "../../hooks/mutations/useAuthMutations";
 
 const Register = () => {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Registro enviado");
+  const navigate = useNavigate();
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+    mode: "onSubmit",
+  });
+
+  const { mutate: registerUser, isPending } = useRegister();
+
+  const onSubmit = async (data) => {
+    const formData = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    };
+
+    registerUser(formData, {
+      onSuccess: () => {
+        reset();
+        navigate("/");
+      },
+    });
   };
+
+  const isLoading = isSubmitting || isPending;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[var(--color-bg)] px-4 py-10 text-[var(--color-text)]">
       <section className="grid w-full max-w-5xl overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl md:grid-cols-[1fr_1.1fr]">
-        <div className="hidden border-r border-[var(--color-border)] bg-[var(--color-sidebar)] p-8 md:flex md:flex-col md:justify-inital gap-10">
+        <div className="hidden border-r border-[var(--color-border)] bg-[var(--color-sidebar)] p-8 md:flex md:flex-col md:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white">DevBoard</h1>
 
@@ -46,41 +81,71 @@ const Register = () => {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <AuthInput
               label="Nombre"
               type="text"
-              name="name"
               placeholder="Agustin"
               icon={FiUser}
+              {...register("name")}
+              error={errors.name?.message}
             />
 
             <AuthInput
               label="Email"
               type="email"
-              name="email"
               placeholder="tuemail@gmail.com"
               icon={FiMail}
+              {...register("email")}
+              error={errors.email?.message}
             />
 
             <AuthInput
               label="Contraseña"
-              type="password"
-              name="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Creá una contraseña"
               icon={FiLock}
+              {...register("password")}
+              error={errors.password?.message}
+              rightElement={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="text-[var(--color-text-muted)] transition hover:text-[var(--color-text)]"
+                >
+                  {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                </button>
+              }
             />
 
             <AuthInput
               label="Confirmar contraseña"
-              type="password"
-              name="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
               placeholder="Repetí tu contraseña"
               icon={FiLock}
+              {...register("confirmPassword")}
+              error={errors.confirmPassword?.message}
+              rightElement={
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  className="text-[var(--color-text-muted)] transition hover:text-[var(--color-text)]"
+                >
+                  {showConfirmPassword ? (
+                    <FiEyeOff size={18} />
+                  ) : (
+                    <FiEye size={18} />
+                  )}
+                </button>
+              }
             />
 
-            <button className="w-full rounded-[var(--radius-md)] bg-[var(--color-light)] px-4 py-3 text-sm font-bold text-[var(--color-primary)] transition hover:bg-white">
-              Crear cuenta
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full rounded-[var(--radius-md)] bg-[var(--color-light)] px-4 py-3 text-sm font-bold text-[var(--color-primary)] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isLoading ? "Creando cuenta..." : "Crear cuenta"}
             </button>
           </form>
 
