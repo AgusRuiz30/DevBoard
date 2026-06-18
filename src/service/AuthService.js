@@ -67,12 +67,12 @@ export const getProfile = async () => {
     throw new Error(sessionError.message || "Error al obtener la sesión");
   }
 
-  const user = sessionData.session.id;
+  const user = sessionData.session.userId;
 
   if (!user) {
     return null;
   }
-
+  console.log(user);
   const { data, error } = await client
     .from("profiles")
     .select("*")
