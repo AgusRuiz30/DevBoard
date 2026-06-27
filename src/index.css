@@ -2,27 +2,29 @@
 
 :root {
   /* Base */
-  --color-bg: #272829;
-  --color-sidebar: #27374d;
-  --color-surface: #1f2021;
-  --color-surface-soft: #343638;
+  --color-bg: #0f1117;
+  --color-sidebar: #151821;
+  --color-surface: #1b1f2a;
+  --color-surface-soft: #242938;
+  --color-surface-hover: #2b3142;
 
-  /* Identidad DevBoard */
-  --color-primary: #27374d;
-  --color-secondary: #526d82;
-  --color-light: #dde6ed;
+  /* Identidad */
+  --color-primary: #3b82f6;
+  --color-primary-soft: rgba(59, 130, 246, 0.14);
+  --color-secondary: #8b5cf6;
+  --color-accent: #22d3ee;
 
   /* Texto */
-  --color-text: #dde6ed;
-  --color-text-muted: #9fb0bf;
-  --color-text-soft: #c5d1dc;
+  --color-text: #e5e7eb;
+  --color-text-soft: #cbd5e1;
+  --color-text-muted: #94a3b8;
 
   /* Bordes */
-  --color-border: rgba(221, 230, 237, 0.12);
-  --color-border-strong: rgba(221, 230, 237, 0.22);
+  --color-border: rgba(148, 163, 184, 0.14);
+  --color-border-strong: rgba(148, 163, 184, 0.28);
 
-  /* Estados de tareas */
-  --status-backlog: #6b7280;
+  /* Estados Kanban */
+  --status-backlog: #64748b;
   --status-todo: #3b82f6;
   --status-in-progress: #8b5cf6;
   --status-review: #f59e0b;

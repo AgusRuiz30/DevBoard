@@ -143,7 +143,7 @@ const Register = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full rounded-[var(--radius-md)] bg-[var(--color-light)] px-4 py-3 text-sm font-bold text-[var(--color-primary)] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 py-3 text-sm font-bold text-[var(--color-light)] transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading ? "Creando cuenta..." : "Crear cuenta"}
             </button>

@@ -111,7 +111,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="flex w-full items-center justify-center gap-3 rounded-[var(--radius-md)] bg-[var(--color-light)] px-4 py-3 text-sm font-bold text-[var(--color-primary)] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-3 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 py-3 text-sm font-bold text-[var(--color-light)] transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading && (
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent" />

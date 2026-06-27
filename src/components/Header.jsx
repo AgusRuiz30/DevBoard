@@ -1,36 +1,34 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import {
   FiBell,
   FiSearch,
   FiFolder,
   FiChevronDown,
   FiPlus,
-  FiX,
 } from "react-icons/fi";
 
-import AuthInput from "./AuthInput";
-import { useAuth } from "../../hooks/queries/useAuth";
-import { useProjects } from "../../hooks/queries/useProjects";
-import { useCreateProject } from "../../hooks/mutations/useProjectsMutations";
+import { useAuth } from "../../hooks/queries/useAuth.js";
+import { useProjects } from "../../hooks/queries/useProjects.js";
+import { useLogout } from "../../hooks/mutations/useAuthMutations.js";
+
+import CreateProjectModal from "./modals/CreateProjectModal.jsx";
+import ConfigUserModal from "./modals/ConfigUserModal.jsx";
 
 const Header = () => {
+  const navigate = useNavigate();
+
   const [isOpen, setIsOpen] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
-
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    stack: "",
-  });
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 
   const { data: profile } = useAuth();
+  const { mutate: logoutUser, isPending: isLoggingOut } = useLogout();
 
   const { data: projectsData, isLoading: isLoadingProjects } = useProjects(
     profile?.profile_id,
   );
-
-  const { mutate: createProject, isPending } = useCreateProject();
 
   const projects = useMemo(() => {
     if (!projectsData) return [];
@@ -62,52 +60,25 @@ const Header = () => {
   };
 
   const handleCloseCreateModal = () => {
-    if (isPending) return;
     setShowCreateModal(false);
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleProjectCreated = () => {
+    setShowCreateModal(false);
   };
 
-  const handleCreateProject = (e) => {
-    e.preventDefault();
+  const handleToggleUserModal = () => {
+    setIsOpen(false);
+    setIsUserModalOpen((prev) => !prev);
+  };
 
-    if (!profile?.profile_id) return;
-
-    createProject(
-      {
-        name: form.name,
-        description: form.description,
-        stack: form.stack
-          .split(",")
-          .map((tech) => tech.trim())
-          .filter(Boolean),
-        profile_id: profile.profile_id,
+  const handleLogout = () => {
+    logoutUser(undefined, {
+      onSuccess: () => {
+        setIsUserModalOpen(false);
+        navigate("/login");
       },
-      {
-        onSuccess: (response) => {
-          const newProject = response?.project;
-
-          if (newProject?.id) {
-            setSelectedProjectId(newProject.id);
-          }
-
-          setForm({
-            name: "",
-            description: "",
-            stack: "",
-          });
-
-          setShowCreateModal(false);
-        },
-      },
-    );
+    });
   };
 
   return (
@@ -116,7 +87,10 @@ const Header = () => {
         <div className="relative">
           <button
             type="button"
-            onClick={() => setIsOpen((prev) => !prev)}
+            onClick={() => {
+              setIsUserModalOpen(false);
+              setIsOpen((prev) => !prev);
+            }}
             className="flex items-center gap-3 rounded-xl border border-[var(--color-border-strong)] bg-[var(--color-sidebar)] px-4 py-3 text-sm font-semibold text-[var(--color-text)] transition hover:border-[var(--color-light)]"
           >
             <FiFolder className="text-[var(--color-text-muted)]" size={18} />
@@ -214,89 +188,33 @@ const Header = () => {
             </span>
           </button>
 
-          <div className="h-10 w-10 rounded-full bg-[var(--color-secondary)] text-center text-sm font-bold leading-10 text-white">
-            {profile?.name?.charAt(0)?.toUpperCase() || "U"}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={handleToggleUserModal}
+              className="h-10 w-10 rounded-full bg-[var(--color-secondary)] text-center text-sm font-bold leading-10 text-white transition hover:ring-2 hover:ring-[var(--color-border-strong)]"
+            >
+              {profile?.name?.charAt(0)?.toUpperCase() || "U"}
+            </button>
+
+            {isUserModalOpen && (
+              <ConfigUserModal
+                profile={profile}
+                onClose={() => setIsUserModalOpen(false)}
+                onLogout={handleLogout}
+                isLoggingOut={isLoggingOut}
+              />
+            )}
           </div>
         </div>
       </header>
 
       {showCreateModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
-          <section className="w-full max-w-xl rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-2xl">
-            <div className="mb-6 flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
-                  Nuevo proyecto
-                </p>
-
-                <h2 className="mt-2 text-2xl font-bold text-white">
-                  Crear proyecto
-                </h2>
-
-                <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-                  Se creará el proyecto y quedarás asignado automáticamente como{" "}
-                  <strong className="text-white">Owner</strong>.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleCloseCreateModal}
-                className="rounded-xl border border-[var(--color-border)] p-2 text-[var(--color-text-muted)] transition hover:bg-[var(--color-surface-soft)] hover:text-white"
-              >
-                <FiX size={18} />
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateProject} className="space-y-5">
-              <AuthInput
-                label="Nombre del proyecto"
-                name="name"
-                placeholder="DevBoard"
-                value={form.name}
-                onChange={handleChange}
-                required
-              />
-
-              <label className="block">
-                <span className="mb-2 block text-sm font-semibold text-[var(--color-text-soft)]">
-                  Descripción
-                </span>
-
-                <textarea
-                  name="description"
-                  placeholder="Sistema de tareas y reportes para developers."
-                  value={form.description}
-                  onChange={handleChange}
-                  rows={4}
-                  required
-                  className="w-full resize-none rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-sidebar)] px-4 py-3 text-sm text-[var(--color-text)] outline-none transition placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-secondary)]"
-                />
-              </label>
-
-              <AuthInput
-                label="Stack tecnológico"
-                name="stack"
-                placeholder="React, Neon, Tailwind"
-                value={form.stack}
-                onChange={handleChange}
-                helperText="Separá las tecnologías con coma."
-              />
-
-              <button
-                type="submit"
-                disabled={isPending}
-                className="flex w-full items-center justify-center gap-3 rounded-[var(--radius-md)] bg-[var(--color-light)] px-4 py-3 text-sm font-bold text-[var(--color-primary)] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isPending && (
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent" />
-                )}
-
-                {isPending ? "Creando proyecto..." : "Crear proyecto"}
-              </button>
-            </form>
-          </section>
-        </div>
+        <CreateProjectModal
+          profileId={profile?.profile_id}
+          onCreated={handleProjectCreated}
+          onClose={handleCloseCreateModal}
+        />
       )}
     </>
   );
