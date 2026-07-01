@@ -92,8 +92,8 @@ const Task = () => {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between gap-5 rounded-t-lg border-[var(--color-border)] border-l-4 border-l-[var(--status-todo)] bg-[var(--color-surface)] p-5">
+    <div className="max-w-screen">
+      <div className="flex items-center justify-between gap-5 rounded-t-lg border-[var(--color-border)] border-l-4 border-l-[var(--status-todo)] bg-[var(--color-surface)] p-5 max-w-[100vw]">
         <div>
           <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
             Tareas

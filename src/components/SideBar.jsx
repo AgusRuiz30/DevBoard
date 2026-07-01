@@ -63,7 +63,7 @@ const links = [
 
 const Sidebar = () => {
   return (
-    <aside className="hidden min-h-screen w-75 border-r border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-5 text-[var(--color-text)] md:block">
+    <aside className="hidden min-h-screen min-w-75 border-r border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-5 text-[var(--color-text)] md:block">
       <div className="mb-7 flex items-center gap-3 px-2 border-b border-[var(--color-border)] ">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-light)] text-[var(--color-primary)] ">
           <FaCode size={20} />
