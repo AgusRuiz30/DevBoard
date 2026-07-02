@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiPlus, FiTrash2, FiX } from "react-icons/fi";
+import { useCreateTask } from "../../../hooks/mutations/useTaskMutations";
 
 const STATUS_OPTIONS = [
   { value: "backlog", label: "Backlog / Ideas" },
@@ -24,9 +25,10 @@ const ROLE_OPTIONS = [
 const NewTaskModal = ({
   isOpen,
   onClose,
-  onSubmit,
   defaultStatus = "todo",
   members = [],
+  projectId,
+  profileId,
 }) => {
   const [form, setForm] = useState({
     title: "",
@@ -42,7 +44,34 @@ const NewTaskModal = ({
 
   const [checklistInput, setChecklistInput] = useState("");
 
+  const { mutate: createTask, isPending } = useCreateTask();
+
+  useEffect(() => {
+    if (isOpen) {
+      setForm((prev) => ({
+        ...prev,
+        status: defaultStatus,
+      }));
+    }
+  }, [defaultStatus, isOpen]);
+
   if (!isOpen) return null;
+
+  const resetForm = () => {
+    setForm({
+      title: "",
+      description: "",
+      status: defaultStatus,
+      priority: "Media",
+      assignee: "",
+      role: "FrontEnd UI",
+      tags: "",
+      dueDate: "",
+      checklist: [],
+    });
+
+    setChecklistInput("");
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -76,47 +105,33 @@ const NewTaskModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    onSubmit?.({
+    if (!projectId || !profileId) {
+      console.log("Falta projectId o profileId");
+      return;
+    }
+
+    createTask({
       title: form.title,
-      description: form.description,
       status: form.status,
+      profile_id: profileId,
       priority: form.priority,
-      assignee: form.assignee,
-      role: form.role,
-      tags: form.tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-      dueDate: form.dueDate,
       checklist: form.checklist,
+      role: form.role,
+      project_id: projectId,
     });
-
-    setForm({
-      title: "",
-      description: "",
-      status: defaultStatus,
-      priority: "Media",
-      assignee: "",
-      role: "FrontEnd UI",
-      tags: "",
-      dueDate: "",
-      checklist: [],
-    });
-
-    setChecklistInput("");
-    onClose?.();
   };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
-      <section className="w-full max-w-3xl rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-2xl">
+      <section className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-2xl custom-scroll">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl font-bold text-white">Nueva tarea</h2>
 
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-[var(--color-text-muted)] transition hover:bg-[var(--color-surface-soft)] hover:text-white"
+            disabled={isPending}
+            className="rounded-lg p-2 text-[var(--color-text-muted)] transition hover:bg-[var(--color-surface-soft)] hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
             <FiX size={20} />
           </button>
@@ -233,7 +248,7 @@ const NewTaskModal = ({
 
             <label className="block">
               <span className="mb-2 block text-xs font-bold uppercase tracking-wide text-[var(--color-text-muted)]">
-                Tags
+                Stack / Tags
               </span>
 
               <input
@@ -265,7 +280,7 @@ const NewTaskModal = ({
               Checklist
             </span>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <input
                 value={checklistInput}
                 onChange={(e) => setChecklistInput(e.target.value)}
@@ -276,7 +291,7 @@ const NewTaskModal = ({
               <button
                 type="button"
                 onClick={handleAddChecklistItem}
-                className="flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-light)] px-4 py-3 text-sm font-bold text-[var(--color-primary)] transition hover:bg-white"
+                className="flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-light)] px-4 py-3 text-sm font-bold text-[var(--color-primary)] transition hover:bg-white"
               >
                 <FiPlus />
                 Agregar
@@ -315,16 +330,22 @@ const NewTaskModal = ({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-[var(--radius-md)] px-4 py-2 text-sm font-bold text-[var(--color-text)] transition hover:bg-[var(--color-surface-soft)]"
+              disabled={isPending}
+              className="rounded-[var(--radius-md)] px-4 py-2 text-sm font-bold text-[var(--color-text)] transition hover:bg-[var(--color-surface-soft)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               Cancelar
             </button>
 
             <button
               type="submit"
-              className="rounded-[var(--radius-md)] bg-[var(--color-light)] px-5 py-2 text-sm font-bold text-[var(--color-primary)] transition hover:bg-white"
+              disabled={isPending || !projectId || !profileId}
+              className="flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-light)] px-5 py-2 text-sm font-bold text-[var(--color-primary)] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Crear tarea
+              {isPending && (
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent" />
+              )}
+
+              {isPending ? "Creando..." : "Crear tarea"}
             </button>
           </div>
         </form>

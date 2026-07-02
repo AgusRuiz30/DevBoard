@@ -2,41 +2,76 @@ import { client } from "../lib/NeonClient";
 
 export const createTask = async ({
   title,
-  description,
-  dueDate,
+  status,
+  profile_id,
   priority,
-  assignee,
-  checklist,
-  stack,
+  checklist = [],
+  role,
+  project_id,
 }) => {
-  const { data, error } = await client.from("tasks").insert({
-    title,
-    description,
-    dueDate,
+  const payload = {
+    name: title,
+    status,
+    profile_id,
     priority,
-    assignee,
     checklist,
-    stack,
-  });
+    rol: role,
+    project_id,
+  };
+
+  console.log("Payload createTask:", payload);
+
+  const { data, error } = await client
+    .from("tasks")
+    .insert(payload)
+    .select()
+    .single();
 
   if (error) {
+    console.log("Error createTask:", error);
     throw new Error(error.message || "Error al crear la tarea");
   }
 
   return data;
 };
 
-export const updateTask = async ({ task_id, title, description }) => {
+export const getTasksByProject = async (project_id) => {
+  const { data, error } = await client
+    .from("tasks")
+    .select("*")
+    .eq("project_id", project_id);
+
+  if (error) {
+    console.log("Error getTasksByProject:", error);
+    throw new Error(error.message || "Error al obtener tareas");
+  }
+
+  return data;
+};
+
+export const updateTask = async ({
+  task_id,
+  title,
+  status,
+  priority,
+  checklist,
+  role,
+}) => {
   const { data, error } = await client
     .from("tasks")
     .update({
-      title,
-      description,
+      name: title,
+      status,
+      priority,
+      checklist,
+      rol: role,
     })
     .eq("id", task_id)
+    .select()
     .single();
 
   if (error) {
+    console.log("Error updateTask:", error);
     throw new Error(error.message || "Error al actualizar la tarea");
   }
 
@@ -50,9 +85,11 @@ export const updateTaskStatus = async ({ task_id, status }) => {
       status,
     })
     .eq("id", task_id)
+    .select()
     .single();
 
   if (error) {
+    console.log("Error updateTaskStatus:", error);
     throw new Error(error.message || "Error al actualizar el estado");
   }
 
@@ -64,9 +101,11 @@ export const deleteTask = async ({ task_id }) => {
     .from("tasks")
     .delete()
     .eq("id", task_id)
+    .select()
     .single();
 
   if (error) {
+    console.log("Error deleteTask:", error);
     throw new Error(error.message || "Error al eliminar la tarea");
   }
 

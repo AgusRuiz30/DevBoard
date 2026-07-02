@@ -166,4 +166,3 @@ const ListTask = ({ tasks = [], onChangeStatus, onCreateTask }) => {
 };
 
 export default ListTask;
-   

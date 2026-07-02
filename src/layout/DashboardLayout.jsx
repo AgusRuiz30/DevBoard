@@ -1,17 +1,19 @@
-import { Outlet } from "react-router";
+import { Outlet, useLocation } from "react-router";
 import Sidebar from "../components/SideBar";
 import Header from "../components/Header";
 
 const DashboardLayout = () => {
+  const location = useLocation();
+
   return (
-    <div className="min-h-screen bg-light text-primary">
-      <div className="flex">
-        <Sidebar />
+    <div className="flex h-screen overflow-hidden bg-[var(--color-bg)] text-[var(--color-text)]">
+      <Sidebar />
 
-        <main className="flex min-h-screen flex-1 flex-col">
-          <Header />
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <Header />
 
-          <section className="p-6">
+        <main className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+          <section key={location.pathname} className="outlet-animation p-5">
             <Outlet />
           </section>
         </main>

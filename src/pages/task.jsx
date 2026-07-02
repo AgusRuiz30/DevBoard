@@ -1,63 +1,22 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FiPlus } from "react-icons/fi";
+
 import { useProjects } from "../../hooks/queries/useProjects";
 import { useAuth } from "../../hooks/queries/useAuth";
+import { useTasks } from "../../hooks/queries/useTask";
+
+import {
+  useCreateTask,
+  useUpdateTaskStatus,
+} from "../../hooks/mutations/useTaskMutations";
+
 import ListTask from "../components/ListTask";
-import { useState } from "react";
-
 import NewTaskModal from "../components/modals/NewTaskModal";
-
-const tasks = [
-  {
-    id: "1",
-    title: "Aplicarle RHF a todos los inputs",
-    description: "Inputs de sets",
-    dueDate: "2026-06-25",
-    status: "todo",
-    priority: "Alta",
-  },
-  {
-    id: "2",
-    title: "Crear schemas en Zod",
-    description: "Validaciones principales",
-    dueDate: "2026-06-26",
-    status: "in_progress",
-    priority: "Media",
-  },
-  {
-    id: "3",
-    title: "Mejorar UI del calendario",
-    description: "Cards, estados y responsive",
-    dueDate: "2026-06-28",
-    status: "in_progress",
-    priority: "Media",
-  },
-  {
-    id: "4",
-    title: "Estructura de carpetas",
-    description: "components, pages, layouts",
-    dueDate: "2026-06-30",
-    status: "done",
-    priority: "Alta",
-  },
-];
 
 const Task = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [defaultTaskStatus, setDefaultTaskStatus] = useState("todo");
 
-  const handleCreateTask = (status = "todo") => {
-    setDefaultTaskStatus(status);
-    setIsCreateModalOpen(true);
-  };
-
-  const handleSubmitTask = (taskData) => {
-    console.log("Nueva tarea:", {
-      ...taskData,
-      project_id: selectedProject?.id,
-      profile_id: profile?.profile_id,
-    });
-  };
   const { data: profile, isLoading: isLoadingProfile } = useAuth();
 
   const { data: projectsData, isLoading: isLoadingProjects } = useProjects(
@@ -74,15 +33,51 @@ const Task = () => {
 
   const selectedProject = projects[0] ?? null;
 
-  const handleChangeStatus = ({ task_id, status }) => {
-    console.log("Tarea movida:", task_id, status);
+  const { data: tasksData, isLoading: isLoadingTasks } = useTasks(
+    selectedProject?.id,
+  );
+
+  const { mutate: createTask, isPending: isCreatingTask } = useCreateTask();
+  const { mutate: updateTaskStatusMutation } = useUpdateTaskStatus();
+
+  const tasks = useMemo(() => {
+    if (!tasksData) return [];
+
+    return tasksData.map((task) => ({
+      id: task.id || task.task_id,
+      title: task.name,
+      description: task.description,
+      dueDate: task.dueDate || task.due_date,
+      status: task.status,
+      priority: task.priority,
+      assignee: task.assignee,
+      role: task.role,
+      checklist: task.checklist,
+      stack: task.stack,
+    }));
+  }, [tasksData]);
+
+  const handleCreateTask = (status = "todo") => {
+    setDefaultTaskStatus(status);
+    setIsCreateModalOpen(true);
   };
 
-  if (isLoadingProfile || isLoadingProjects) {
+  const handleChangeStatus = ({ task_id, status }) => {
+    if (!selectedProject?.id) return;
+
+    updateTaskStatusMutation({
+      task_id,
+      status,
+      project_id: selectedProject.id,
+    });
+  };
+
+  if (isLoadingProfile || isLoadingProjects || isLoadingTasks) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[var(--color-bg)] text-[var(--color-text)] px-4 text-[var(--color-text)]">
+      <main className="flex min-h-full items-center justify-center bg-[var(--color-bg)] px-4 text-[var(--color-text)]">
         <div className="text-center">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-[var(--color-border-strong)] border-t-[var(--color-light)]" />
+
           <p className="mt-4 text-sm text-[var(--color-text-muted)]">
             Cargando tareas...
           </p>
@@ -92,41 +87,53 @@ const Task = () => {
   }
 
   return (
-    <div className="max-w-screen">
-      <div className="flex items-center justify-between gap-5 rounded-t-lg border-[var(--color-border)] border-l-4 border-l-[var(--status-todo)] bg-[var(--color-surface)] p-5 max-w-[100vw]">
-        <div>
-          <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
-            Tareas
-          </span>
+    <div className="min-h-full min-w-0 bg-[var(--color-bg)] text-[var(--color-text)]">
+      <div className="rounded-t-lg border-l-4 border-l-[var(--status-todo)] bg-[var(--color-surface)] p-4 sm:p-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+              Tareas
+            </span>
 
-          <h1 className="text-3xl font-bold text-white">
-            Tablero Kanban — {selectedProject?.name ?? "Sin proyecto"}
-          </h1>
+            <h1 className="mt-1 truncate text-xl font-bold text-white sm:text-2xl xl:text-3xl">
+              Tablero Kanban — {selectedProject?.name ?? "Sin proyecto"}
+            </h1>
 
-          <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-            ¿Qué necesitas hacer hoy?
-          </p>
+            <p className="mt-2 text-sm text-[var(--color-text-muted)]">
+              ¿Qué necesitas hacer hoy?
+            </p>
+          </div>
+
+          <button
+            type="button"
+            disabled={!selectedProject || isCreatingTask}
+            onClick={() => handleCreateTask("todo")}
+            className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          >
+            <FiPlus />
+            Crear tarea
+          </button>
         </div>
-
-        <button
-          className="flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-primary)] text-white hover:bg-blue-500 px-4 py-2 text-sm font-semibold text-[var(--color-primary)] transition "
-          onClick={() => handleCreateTask("todo")}
-        >
-          <FiPlus />
-          Crear tarea
-        </button>
       </div>
 
-      <ListTask
-        tasks={tasks}
-        onChangeStatus={handleChangeStatus}
-        onCreateTask={handleCreateTask}
-      />
+      {!selectedProject ? (
+        <div className="p-5 text-sm text-[var(--color-text-muted)]">
+          Primero tenés que crear o seleccionar un proyecto.
+        </div>
+      ) : (
+        <ListTask
+          tasks={tasks}
+          onChangeStatus={handleChangeStatus}
+          onCreateTask={handleCreateTask}
+        />
+      )}
+
       <NewTaskModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={handleSubmitTask}
         defaultStatus={defaultTaskStatus}
+        projectId={selectedProject?.id}
+        profileId={profile?.profile_id}
         members={[
           {
             id: profile?.profile_id,

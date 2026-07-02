@@ -11,13 +11,13 @@ import {
 import { useAuth } from "../../hooks/queries/useAuth.js";
 import { useProjects } from "../../hooks/queries/useProjects.js";
 import { useLogout } from "../../hooks/mutations/useAuthMutations.js";
-
+import { NotificationsModal } from "./modals/NotificationsModal.jsx";
 import CreateProjectModal from "./modals/CreateProjectModal.jsx";
 import ConfigUserModal from "./modals/ConfigUserModal.jsx";
 
 const Header = () => {
   const navigate = useNavigate();
-
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
@@ -29,7 +29,26 @@ const Header = () => {
   const { data: projectsData, isLoading: isLoadingProjects } = useProjects(
     profile?.profile_id,
   );
-
+  const notifications = [
+    {
+      id: "1",
+      title: "Nueva tarea asignada",
+      message: "Te asignaron la tarea Crear sistema de tareas.",
+      type: "task",
+      is_read: false,
+      project_name: projectsData?.[0]?.name,
+      created_at: "Hace 5 min",
+    },
+    {
+      id: "2",
+      title: "Bug crítico reportado",
+      message: "Se reportó un error en el dashboard principal.",
+      type: "bug",
+      is_read: false,
+      project_name: projectsData?.[0]?.name,
+      created_at: "Hace 20 min",
+    },
+  ];
   const projects = useMemo(() => {
     if (!projectsData) return [];
 
@@ -180,13 +199,34 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <button className="relative rounded-xl border border-[var(--color-border)] bg-[var(--color-sidebar)] p-3 text-[var(--color-text)] transition hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface-soft)]">
-            <FiBell size={18} />
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsNotificationsOpen((prev) => !prev)}
+              className="relative rounded-xl border border-[var(--color-border)] bg-[var(--color-sidebar)] p-3 text-[var(--color-text)] transition hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface-soft)]"
+            >
+              <FiBell size={18} />
 
-            <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--notice-urgent)] text-xs font-bold text-white">
-              3
-            </span>
-          </button>
+              {notifications.filter((item) => !item.is_read).length > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--notice-urgent)] text-xs font-bold text-white">
+                  {notifications.filter((item) => !item.is_read).length}
+                </span>
+              )}
+            </button>
+
+            {isNotificationsOpen && (
+              <NotificationsModal
+                notifications={notifications}
+                onClose={() => setIsNotificationsOpen(false)}
+                onMarkAsRead={(notificationId) => {
+                  console.log("Marcar como leída:", notificationId);
+                }}
+                onMarkAllAsRead={() => {
+                  console.log("Marcar todas como leídas");
+                }}
+              />
+            )}
+          </div>
 
           <div className="relative">
             <button
