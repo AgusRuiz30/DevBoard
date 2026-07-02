@@ -82,17 +82,19 @@ const Dashboard = () => {
   const tasks = useMemo(() => {
     if (!tasksData) return [];
 
-    return tasksData.map((task) => ({
-      id: task.id,
-      title: task.name || task.title,
-      description: task.description || "Sin descripción.",
-      status: task.status,
-      priority: task.priority || "Media",
-      role: task.rol || task.role || "Sin rol",
-      checklist: Array.isArray(task.checklist) ? task.checklist : [],
-      dueDate: task.due_date || task.dueDate,
-      assignee: task.assignee || profile?.name || "Usuario",
-    }));
+    return tasksData
+      .filter((task) => task.profile_id === profile.profile_id)
+      .map((task) => ({
+        id: task.id,
+        title: task.name || task.title,
+        description: task.description || "Sin descripción.",
+        status: task.status,
+        priority: task.priority || "Media",
+        role: task.rol || task.role || "Sin rol",
+        checklist: Array.isArray(task.checklist) ? task.checklist : [],
+        dueDate: task.due_date || task.dueDate,
+        assignee: task.assignee || profile?.name || "Usuario",
+      }));
   }, [tasksData, profile]);
 
   const pendingTasks = useMemo(() => {
