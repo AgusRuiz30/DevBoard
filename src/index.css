@@ -1,55 +1,143 @@
 @import "tailwindcss";
 
 :root {
-  /* Base */
-  --color-bg: #0f1117;
-  --color-sidebar: #151821;
-  --color-surface: #1b1f2a;
-  --color-surface-soft: #242938;
-  --color-surface-hover: #2b3142;
+  /* =====================================================
+     BASE — NEGRO DOMINANTE
+  ===================================================== */
 
-  /* Identidad */
-  --color-primary: #3b82f6;
-  --color-primary-soft: rgba(59, 130, 246, 0.14);
-  --color-secondary: #8b5cf6;
-  --color-accent: #22d3ee;
+  --color-bg: #070709;
+  --color-sidebar: #0c0c10;
+  --color-surface: #121218;
+  --color-surface-soft: #191920;
+  --color-surface-hover: #21212b;
+  --color-surface-elevated: #292934;
+  --color-dark: #030304;
 
-  /* Texto */
-  --color-text: #e5e7eb;
-  --color-text-soft: #cbd5e1;
-  --color-text-muted: #94a3b8;
+  /* =====================================================
+     IDENTIDAD DEVBOARD — OBSIDIAN ORCHID
+  ===================================================== */
 
-  /* Bordes */
-  --color-border: rgba(148, 163, 184, 0.14);
-  --color-border-strong: rgba(148, 163, 184, 0.28);
+  --color-primary: #a970ff;
+  --color-primary-hover: #bc92ff;
+  --color-primary-active: #9358eb;
+  --color-primary-soft: rgba(169, 112, 255, 0.14);
+  --color-primary-border: rgba(169, 112, 255, 0.38);
+  --color-primary-contrast: #08070a;
 
-  /* Estados Kanban */
-  --status-backlog: #64748b;
-  --status-todo: #3b82f6;
-  --status-in-progress: #8b5cf6;
-  --status-review: #f59e0b;
-  --status-done: #22c55e;
+  --color-secondary: #ff6f91;
+  --color-secondary-hover: #ff8aa5;
+  --color-secondary-soft: rgba(255, 111, 145, 0.13);
 
-  /* Prioridades */
-  --priority-low: #22c55e;
-  --priority-medium: #3b82f6;
-  --priority-high: #f97316;
-  --priority-critical: #ef4444;
+  --color-accent: #f3c969;
+  --color-accent-hover: #f8d98f;
+  --color-accent-soft: rgba(243, 201, 105, 0.13);
 
-  /* Avisos */
-  --notice-info: #38bdf8;
-  --notice-important: #f59e0b;
-  --notice-urgent: #ef4444;
+  --color-light: #f4f2f7;
 
-  /* Reportes */
-  --report-generated: #3b82f6;
-  --report-pending: #f59e0b;
-  --report-reviewed: #22c55e;
+  /* =====================================================
+     TEXTO
+  ===================================================== */
 
-  /* UI */
+  --color-text: #f4f2f7;
+  --color-text-soft: #cfccd6;
+  --color-text-muted: #918d9c;
+  --color-text-disabled: #5f5c68;
+  --color-text-inverse: #09090b;
+
+  /* =====================================================
+     BORDES
+  ===================================================== */
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+  --color-border-focus: rgba(169, 112, 255, 0.7);
+
+  /* =====================================================
+     ESTADOS KANBAN
+  ===================================================== */
+
+  --status-backlog: #777481;
+  --status-backlog-soft: rgba(119, 116, 129, 0.14);
+
+  --status-todo: #ff6f91;
+  --status-todo-soft: rgba(255, 111, 145, 0.14);
+
+  --status-in-progress: #a970ff;
+  --status-in-progress-soft: rgba(169, 112, 255, 0.14);
+
+  --status-review: #f3c969;
+  --status-review-soft: rgba(243, 201, 105, 0.14);
+
+  --status-done: #3ddc97;
+  --status-done-soft: rgba(61, 220, 151, 0.14);
+
+  /* =====================================================
+     PRIORIDADES
+  ===================================================== */
+
+  --priority-low: #3ddc97;
+  --priority-low-soft: rgba(61, 220, 151, 0.13);
+
+  --priority-medium: #c58cff;
+  --priority-medium-soft: rgba(197, 140, 255, 0.13);
+
+  --priority-high: #ff9d5c;
+  --priority-high-soft: rgba(255, 157, 92, 0.13);
+
+  --priority-critical: #ff566f;
+  --priority-critical-soft: rgba(255, 86, 111, 0.13);
+
+  /* =====================================================
+     AVISOS
+  ===================================================== */
+
+  --notice-info: #a970ff;
+  --notice-info-soft: rgba(169, 112, 255, 0.13);
+
+  --notice-important: #f3c969;
+  --notice-important-soft: rgba(243, 201, 105, 0.13);
+
+  --notice-urgent: #ff566f;
+  --notice-urgent-soft: rgba(255, 86, 111, 0.13);
+
+  /* =====================================================
+     BUGS
+  ===================================================== */
+
+  --bug-low: #777481;
+  --bug-medium: #f3c969;
+  --bug-high: #ff9d5c;
+  --bug-critical: #ff566f;
+
+  /* =====================================================
+     REPORTES
+  ===================================================== */
+
+  --report-generated: #a970ff;
+  --report-generated-soft: rgba(169, 112, 255, 0.13);
+
+  --report-pending: #f3c969;
+  --report-pending-soft: rgba(243, 201, 105, 0.13);
+
+  --report-reviewed: #3ddc97;
+  --report-reviewed-soft: rgba(61, 220, 151, 0.13);
+
+  /* =====================================================
+     SOMBRAS
+  ===================================================== */
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.38);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.55);
+
+  /* =====================================================
+     UI
+  ===================================================== */
+
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
+
   --transition: 0.2s ease;
 }
 

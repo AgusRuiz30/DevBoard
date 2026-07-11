@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import {
   FiBell,
@@ -22,7 +22,9 @@ const Header = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
-
+  const projectDropdownRef = useRef(null);
+  const notificationsRef = useRef(null);
+  const userModalRef = useRef(null);
   const { data: profile } = useAuth();
   const { mutate: logoutUser, isPending: isLoggingOut } = useLogout();
 
@@ -67,7 +69,38 @@ const Header = () => {
       projects[0]
     );
   }, [projects, selectedProjectId]);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const clickedOutsideProject =
+        projectDropdownRef.current &&
+        !projectDropdownRef.current.contains(event.target);
 
+      const clickedOutsideNotifications =
+        notificationsRef.current &&
+        !notificationsRef.current.contains(event.target);
+
+      const clickedOutsideUser =
+        userModalRef.current && !userModalRef.current.contains(event.target);
+
+      if (clickedOutsideProject) {
+        setIsOpen(false);
+      }
+
+      if (clickedOutsideNotifications) {
+        setIsNotificationsOpen(false);
+      }
+
+      if (clickedOutsideUser) {
+        setIsUserModalOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   const handleSelectProject = (project) => {
     setSelectedProjectId(project.id);
     setIsOpen(false);
@@ -103,7 +136,7 @@ const Header = () => {
   return (
     <>
       <header className="relative flex items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-4">
-        <div className="relative">
+        <div ref={projectDropdownRef} className="relative">
           <button
             type="button"
             onClick={() => {
@@ -199,7 +232,7 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="relative">
+          <div ref={notificationsRef} className="relative">
             <button
               type="button"
               onClick={() => setIsNotificationsOpen((prev) => !prev)}
@@ -228,7 +261,7 @@ const Header = () => {
             )}
           </div>
 
-          <div className="relative">
+          <div ref={userModalRef} className="relative">
             <button
               type="button"
               onClick={handleToggleUserModal}

@@ -98,7 +98,7 @@ const Dashboard = () => {
   }, [tasksData, profile]);
 
   const pendingTasks = useMemo(() => {
-    return tasks.filter((task) => task.status !== "done").slice(0, 4);
+    return tasks.filter((task) => task.status !== "done").slice(5);
   }, [tasks]);
 
   const completedTasks = useMemo(() => {
@@ -121,7 +121,7 @@ const Dashboard = () => {
     navigate("/task");
   };
 
-  if (isLoadingProfile || isLoadingProjects) {
+  if (isLoadingProfile || isLoadingProjects || isLoadingTasks) {
     return (
       <main className="flex min-h-full items-center justify-center bg-[var(--color-bg)] text-[var(--color-text)]">
         <div className="text-center">

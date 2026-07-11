@@ -6,6 +6,7 @@ import Register from "./pages/Register.jsx";
 import ProtectedRoutes from "./ProtectedRoutes.jsx";
 import Task from "./pages/task.jsx";
 import { Notices } from "./pages/Notices.jsx";
+import Settings from "./pages/Settings.jsx";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/task" element={<Task />} />
             <Route path="/notices" element={<Notices />} />
+            <Route path="/settings" element={<Settings />} />
             {/* <Route path="/bugs" element={<Bugs />} /> */}
             {/* <Route path="/reports" element={<Reports />} /> */}
           </Route>
